@@ -41,6 +41,7 @@ def process_beam(args, freq_label, ipix):
                         'ROI_LON={phi:.4f}&ROI_LAT={theta:.4f}&FREQUENCY=30&RELEASE={release}&ProductType=BEAM'.format(
                         theta=theta, phi=phi, release=args.release))
         uri = r.json()[0]
+        print 'Downloading', uri
 
         # Check that we agree with portal on ipix..
         assert ('_%s.fits.gz' % ipix) in uri
@@ -67,7 +68,7 @@ def process_beam(args, freq_label, ipix):
         group_name = '/%d' % ipix
         f.create_dataset(group_name + '/indices', data=indices)
         f.create_dataset(group_name + '/values', data=values)
-        grp = f[group_name]
+        grp = f['/']
         grp.attrs['nside'] = nside
 
 
