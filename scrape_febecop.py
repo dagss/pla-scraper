@@ -70,6 +70,6 @@ def process_beam(args, freq_label, ipix):
 
 with open(args.input_file) as f:
     for line in f.readlines():
-        freq_label, ipix = [x.strip() for x in line.split(' ')]
+        freq_label, ipix = [x.strip() for x in line.split()]
         ipix = int(ipix)
         process_beam(args, freq_label, ipix)
