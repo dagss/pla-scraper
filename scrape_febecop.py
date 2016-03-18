@@ -38,10 +38,10 @@ def process_beam(args, freq_label, ipix):
 
         # Get JSON data pointing to gzipped FITS file
         r = requests.get('http://pla.esac.esa.int/pla-sl/data-action?'
-                        'ROI_LON={phi:.4f}&ROI_LAT={theta:.4f}&FREQUENCY=30&RELEASE={release}&ProductType=BEAM'.format(
-                        theta=theta, phi=phi, release=args.release))
+                        'ROI_LON={phi:.4f}&ROI_LAT={theta:.4f}&FREQUENCY={freq_label}&RELEASE={release}&ProductType=BEAM'.format(
+                        theta=theta, phi=phi, release=args.release, freq_label=freq_label))
         uri = r.json()[0]
-        print 'Downloading', uri
+        print 'Downloading: %s' % uri
 
         # Check that we agree with portal on ipix..
         assert ('_%s.fits.gz' % ipix) in uri
@@ -59,7 +59,7 @@ def process_beam(args, freq_label, ipix):
 
     assert 12 * nside**2 == map.shape[0]  # otherwise we are wrong about data hosted in portal
     threshold = args.threshold * map.max()
-    indices = (map > threshold).nonzero()[0].astype(np.int32)
+    indices = (np.abs(map) > threshold).nonzero()[0].astype(np.int32)
     values = map[indices].astype(np.float32)
             
     # Convert to sparse. We re-open the HDF file every time in order to be more
@@ -73,10 +73,13 @@ def process_beam(args, freq_label, ipix):
 
 
 with open(args.input_file) as f:
-    for line in f.readlines():
+    lines = f.readlines()
+    n = len(lines)
+    for i, line in enumerate(lines):
         cols = [x.strip() for x in line.split()]
         if cols == [] or cols[0].startswith('#'):
             continue
         freq_label, ipix = cols[:2]
         ipix = int(ipix)
+        print '%.1f %%' % ((i * 100.) / n)
         process_beam(args, freq_label, ipix)
