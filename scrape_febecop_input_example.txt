@@ -1,3 +1,6 @@
-30 0
-30 12582911
-43 12582911
+30     0  another column
+30   12582911 more stuff
+# a comment is ignored, also an empty line:
+
+43  12582911
+
